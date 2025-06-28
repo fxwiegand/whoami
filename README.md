@@ -1,18 +1,21 @@
-# Wer bin ich? – Flask Partyspiel
+whoami/README.md
+```
 
-**"Wer bin ich?"** ist ein einfaches, browserbasiertes Partyspiel, das mit Python und Flask umgesetzt ist. Jeder Spieler bekommt von einem Mitspieler eine berühmte Persönlichkeit oder Figur zugewiesen und muss erraten, wer er ist.
+# Who am I? – Flask Party Game
+
+**"Who am I?"** is a simple, browser-based party game built with Python and Flask. Each player is assigned a famous person or character by another player and must guess who they are.
 
 ## Features
 
-- Schnelles Erstellen und Teilen von Spielen per Link
-- Wiedereinstieg für Spieler über persönlichen Link
-- Automatische Aktualisierung der Spieler- und Ergebnislisten
-- Einladungslink für Freunde
-- Modernes, responsives UI (funktioniert auf Desktop und Mobile)
+- Quickly create and share games via link
+- Players can rejoin using their personal link
+- Automatic updating of player and result lists
+- Invitation link for friends
+- Modern, responsive UI (works on desktop and mobile)
 
 ## Installation
 
-1. **Repository klonen**
+1. **Clone the repository**
 
    GitHub: [https://github.com/fxwiegand/whoami](https://github.com/fxwiegand/whoami)
 
@@ -21,52 +24,52 @@
    cd whoami
    ```
 
-2. **Abhängigkeiten installieren**
+2. **Install dependencies**
 
-   Am einfachsten per pip:
+   The easiest way is via pip:
 
    ```bash
    pip install -r requirements.txt
    ```
 
-3. **Server starten**
+3. **Start the server**
 
    ```bash
    python app.py
    ```
 
-   Du kannst Host, Port und Debug-Modus per Umgebungsvariablen steuern (optional):
+   You can control host, port, and debug mode via environment variables (optional):
 
    ```bash
    WHOAMI_HOST=0.0.0.0 WHOAMI_PORT=8080 WHOAMI_DEBUG=0 python app.py
    ```
 
-   Standardwerte sind:
+   Default values are:
    - `WHOAMI_HOST=127.0.0.1`
    - `WHOAMI_PORT=5000`
-   - `WHOAMI_DEBUG=1` (aktiviert Debug-Modus)
+   - `WHOAMI_DEBUG=1` (enables debug mode)
 
-4. **Im Browser öffnen**
+4. **Open in your browser**
 
-   Gehe zu [http://localhost:5000](http://localhost:5000)
+   Go to [http://localhost:5000](http://localhost:5000)
 
-## Dateien
+## Files
 
-- `app.py` – Flask Backend, Spiellogik und API
-- `static/script.js` – Frontend-Logik (JS)
-- `templates/game.html` – HTML-Template für das Spiel
-- `requirements.txt` – Python-Abhängigkeiten
+- `app.py` – Flask backend, game logic, and API
+- `static/script.js` – Frontend logic (JS)
+- `templates/game.html` – HTML template for the game
+- `requirements.txt` – Python dependencies
 
-## Hinweise
+## Notes
 
-- Das Spiel speichert alle Daten nur im RAM. Nach einem Neustart des Servers sind alle Spiele gelöscht.
-- Für produktiven Einsatz sollte ein echtes Datenbank-Backend verwendet werden.
-- Die Cleanup-Route `/cleanup` entfernt abgelaufene Spiele (TTL 1 Stunde).
+- The game stores all data in RAM only. All games are deleted after a server restart.
+- For production use, a real database backend is recommended.
+- The cleanup route `/cleanup` removes expired games (TTL 1 hour).
 
-## Lizenz
+## License
 
 MIT License
 
 ---
 
-Viel Spaß beim Spielen! 🎉
+Have fun playing! 🎉
