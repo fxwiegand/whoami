@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 import uuid, time, secrets
+import os
 
 app = Flask(__name__)
 games = {}
@@ -69,4 +70,7 @@ def cleanup():
     return f"Removed {len(to_delete)} games."
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    host = os.environ.get("WHOAMI_HOST", "127.0.0.1")
+    port = int(os.environ.get("WHOAMI_PORT", 5000))
+    debug = os.environ.get("WHOAMI_DEBUG", "1").lower() in ("1", "true", "yes", "on")
+    app.run(host=host, port=port, debug=debug)

@@ -14,8 +14,10 @@
 
 1. **Repository klonen**
 
+   GitHub: [https://github.com/fxwiegand/whoami](https://github.com/fxwiegand/whoami)
+
    ```bash
-   git clone <REPO-URL>
+   git clone https://github.com/fxwiegand/whoami.git
    cd whoami
    ```
 
@@ -32,6 +34,17 @@
    ```bash
    python app.py
    ```
+
+   Du kannst Host, Port und Debug-Modus per Umgebungsvariablen steuern (optional):
+
+   ```bash
+   WHOAMI_HOST=0.0.0.0 WHOAMI_PORT=8080 WHOAMI_DEBUG=0 python app.py
+   ```
+
+   Standardwerte sind:
+   - `WHOAMI_HOST=127.0.0.1`
+   - `WHOAMI_PORT=5000`
+   - `WHOAMI_DEBUG=1` (aktiviert Debug-Modus)
 
 4. **Im Browser öffnen**
 
