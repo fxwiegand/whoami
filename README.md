@@ -1,6 +1,3 @@
-whoami/README.md
-```
-
 # Wer bin ich? – Flask Partyspiel
 
 **"Wer bin ich?"** ist ein einfaches, browserbasiertes Partyspiel, das mit Python und Flask umgesetzt ist. Jeder Spieler bekommt von einem Mitspieler eine berühmte Persönlichkeit oder Figur zugewiesen und muss erraten, wer er ist.
