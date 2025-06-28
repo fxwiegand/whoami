@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Wer bin ich?</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <script defer src="/static/script.js"></script>
+</head>
+<body class="bg-gradient-to-r from-pink-100 to-indigo-100 min-h-screen flex items-center justify-center">
+  <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-2xl min-h-[60vh] flex flex-col justify-center items-center text-center">
+    <h1 class="text-4xl font-extrabold mb-6 tracking-tight">Wer bin ich?</h1>
+
+    <div id="setup" class="w-full max-w-sm mx-auto">
+      <input id="name" placeholder="Dein Name" class="input">
+      <button onclick="join()" class="btn">Beitreten</button>
+    </div>
+
+    <div id="choose" class="hidden w-full max-w-sm mx-auto">
+      <p class="mb-2 text-lg">Wähle eine Figur für:</p>
+      <select id="target" class="input mb-2"></select>
+      <input id="character" placeholder="z. B. Angela Merkel" class="input">
+      <button onclick="submitCharacter()" class="btn">Absenden</button>
+    </div>
+
+    <div id="result" class="hidden w-full max-w-lg mx-auto">
+      <h2 class="text-2xl font-semibold mb-4">Die anderen sind:</h2>
+      <ul id="list" class="flex flex-col gap-3 items-center"></ul>
+    </div>
+  </div>
+
+  <style>
+    .input { width: 100%; padding: 0.7rem; border-radius: 0.7rem; border: 1.5px solid #ccc; margin-bottom: 0.7rem; font-size: 1.1rem; }
+    .btn { background: #6366f1; color: white; padding: 0.7rem 1.3rem; border-radius: 0.7rem; font-size: 1.1rem; }
+    @media (max-width: 600px) {
+      .max-w-2xl { max-width: 98vw !important; }
+      .max-w-lg { max-width: 98vw !important; }
+      .max-w-sm { max-width: 98vw !important; }
+      .p-8 { padding: 1.2rem !important; }
+    }
+  </style>
+</body>
+</html>
