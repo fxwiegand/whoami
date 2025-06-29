@@ -8,7 +8,16 @@ TTL_SECONDS = 3600
 
 @app.route("/")
 def index():
-    return redirect("/new")
+    now = time.time()
+    # Only show games that are not expired
+    ongoing_games = []
+    for gid, g in games.items():
+        if now - g["created"] <= TTL_SECONDS:
+            ongoing_games.append({
+                "game_id": gid,
+                "players": list(g["players"].values())
+            })
+    return render_template("home.html", games=ongoing_games)
 
 @app.route("/new")
 def new_game():
