@@ -1,4 +1,4 @@
-# Who am I? – Flask Party Game
+# Who am I? – FastAPI Party Game
 
 **"Who am I?"** is a simple, browser-based party game built with Python and FastAPI. 
 Each player is assigned a famous person or character by another player and must guess who they are.
