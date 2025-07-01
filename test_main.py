@@ -28,11 +28,18 @@ def test_new_game():
 
 
 def test_join_game_not_found():
-    response = client.post("/join/abcdefgh")
+    app.games = {}
+    response = client.get("/abcdefgh")
     assert response.status_code == 404
 
 
 def test_join_game():
-    app.games = {'G0LqkhMX': {'characters': {}, 'created': 1751375113.527828, 'players': {}}}
-    response = client.get("/joinG0LqkhMX")
+    app.games = {'8KwSpmQW': {
+        'created': 1751375661.8583481, 'players': {'5nCADHw5eQM': 'test'}, 'characters': {}}
+    }
+    response = client.get("/8KwSpmQW")
     assert response.status_code == 200
+    assert "Wer bin ich?" in response.text
+    assert "Beitreten" in response.text
+    assert "Wähle eine Figur" in response.text
+    # assert "Die anderen sind:" in response.text

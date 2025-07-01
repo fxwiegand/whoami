@@ -48,7 +48,7 @@ def new_game(request: Request):
 @app.get("/{game_id}")
 def join_game(game_id: str, request: Request):
     if game_id not in app.games:
-        return "Spiel nicht gefunden", 404
+        return Response(status_code=status.HTTP_404_NOT_FOUND)
     return templates.TemplateResponse(
         request, "game.html", {"game_id": game_id}
     )
