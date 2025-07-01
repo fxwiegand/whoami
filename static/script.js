@@ -139,6 +139,7 @@ async function submitCharacter() {
      headers: { 'Content-Type': 'application/json' },
      body: JSON.stringify({ from_player: playerId, for_player, character })
    });
+   console.log(resp);
    if (!resp.ok) {
      const data = await resp.json();
      alert(data.error || "Fehler beim Absenden.");

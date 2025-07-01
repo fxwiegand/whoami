@@ -1,4 +1,5 @@
 from fastapi.testclient import TestClient
+from fastapi import status
 
 from main import app
 
@@ -7,7 +8,7 @@ client = TestClient(app)
 
 def test_index_no_games():
     response = client.get("/")
-    assert response.status_code == response.HTTP_200_OK
+    assert response.status_code == status.HTTP_200_OK
     assert "Wer bin ich?" in response.text
     assert "Keine Spiele. Start ein neues!" in response.text
     assert response.headers["Content-Type"] == "text/html; charset=utf-8"
@@ -17,7 +18,7 @@ def test_index_no_games():
 
 def test_new_game():
     response = client.get("/new")
-    assert response.status_code == response.HTTP_200_OK
+    assert response.status_code == status.HTTP_200_OK
     assert "Wer bin ich?" in response.text
     assert "Beitreten" in response.text
     assert "Wähle eine Figur" in response.text
@@ -30,7 +31,7 @@ def test_new_game():
 def test_join_game_not_found():
     app.games = {}
     response = client.get("/abcdefgh")
-    assert response.status_code == response.HTTP_404_NOT_FOUND
+    assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
 def test_join_game():
@@ -38,7 +39,7 @@ def test_join_game():
         'created': 1751375661.8583481, 'players': {'5nCADHw5eQM': 'test'}, 'characters': {}}
     }
     response = client.get("/8KwSpmQW")
-    assert response.status_code == response.HTTP_200_OK
+    assert response.status_code == status.HTTP_200_OK
     assert "Wer bin ich?" in response.text
     assert "Beitreten" in response.text
     assert "Wähle eine Figur" in response.text

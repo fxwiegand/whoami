@@ -1,23 +1,16 @@
 import time
 import secrets
 
-from fastapi import FastAPI
-from fastapi import Response, status
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI, Request, Response, status
+from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.encoders import jsonable_encoder
-from pydantic_settings import BaseSettings
-from fastapi import Request
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 
 
-class Settings(BaseSettings):
-    message: str
-
 app = FastAPI()
 app.games = {}
-TTL_SECONDS = 3600
+app.TTL_SECONDS = 3600
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
@@ -29,7 +22,7 @@ def index(request: Request):
     # Only show games that are not expired
     ongoing_games = []
     for gid, g in app.games.items():
-        if now - g["created"] <= TTL_SECONDS:
+        if now - g["created"] <= app.TTL_SECONDS:
             ongoing_games.append({
                 "game_id": gid,
                 "players": list(g["players"].values())
@@ -78,16 +71,20 @@ def get_players(game_id: str, request: Request):
     return JSONResponse({})
 
 @app.post("/{game_id}/set")
-async def set_character(game_id: int, request: Request):
+async def set_character(game_id: str, request: Request):
+    print('set_character called')
     data = await request.json()
     if data["for_player"] in app.games[game_id]["characters"]:
         return jsonable_encoder({
             "error": "Für diesen Spieler wurde bereits eine Figur vergeben."}
         ), 400
+    print('app.games', app.games)
+    print('data', data)
     app.games[game_id]["characters"][data["for_player"]] = {
         "from": data["from_player"],
         "name": data["character"]
     }
+    print('app.games after', app.games)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 @app.get("/{game_id}/reveal/{player_id}")
 def reveal(game_id: str, player_id: str):
@@ -105,7 +102,7 @@ def reveal(game_id: str, player_id: str):
 @app.get("/cleanup")
 def cleanup():
     now = time.time()
-    to_delete = [gid for gid, g in app.games.items() if now - g["created"] > TTL_SECONDS]
+    to_delete = [gid for gid, g in app.games.items() if now - g["created"] > app.TTL_SECONDS]
     for gid in to_delete:
         del app.games[gid]
     return f"Removed {len(to_delete)} app.games."
