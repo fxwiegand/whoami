@@ -3,7 +3,6 @@ import secrets
 
 from fastapi import FastAPI, Request, Response, status
 from fastapi.responses import JSONResponse, RedirectResponse
-from fastapi.encoders import jsonable_encoder
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
@@ -61,17 +60,17 @@ async def join(game_id: str, request: Request):
             app.games[game_id]["players"][player_id] = name
         else:
             name = app.games[game_id]["players"][player_id]
-        return JSONResponse(jsonable_encoder(player))
+        return JSONResponse(player)
     player_id = secrets.token_urlsafe(8)
     app.games[game_id]["players"][player_id] = name
-    return JSONResponse(jsonable_encoder(player))
+    return JSONResponse(player)
 
 
 @app.get("/{game_id}/players")
 def get_players(game_id: str, request: Request):
     if game_id in app.games:
         if "players" in app.games[game_id]:
-            return JSONResponse(jsonable_encoder(app.games[game_id]["players"]))
+            return JSONResponse(app.games[game_id]["players"])
     return JSONResponse({})
 
 
@@ -79,7 +78,7 @@ def get_players(game_id: str, request: Request):
 async def set_character(game_id: str, request: Request):
     data = await request.json()
     if data["for_player"] in app.games[game_id]["characters"]:
-        return jsonable_encoder({
+        return JSONResponse({
             "error": "Für diesen Spieler wurde bereits eine Figur vergeben."}
         ), 400
     for_player = data["for_player"]
@@ -97,13 +96,14 @@ def reveal(game_id: str, player_id: str):
         if pid != player_id:
             result[app.games[game_id]["players"][pid]] = entry["name"]
     assigned = player_id in app.games[game_id]["characters"]
-    return jsonable_encoder({"characters": result, "assigned": assigned})
+    return JSONResponse({"characters": result, "assigned": assigned})
 
 
 @app.get("/cleanup")
-def cleanup():
+def cleanup(request: Request):
     now = time.time()
     to_delete = [gid for gid, g in app.games.items() if now - g["created"] > app.TTL_SECONDS]
+    message = f"Removed {len(to_delete)} app.games."
     for gid in to_delete:
         del app.games[gid]
-    return f"Removed {len(to_delete)} app.games."
+    return JSONResponse({"message": message})
