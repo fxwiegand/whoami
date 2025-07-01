@@ -72,19 +72,16 @@ def get_players(game_id: str, request: Request):
 
 @app.post("/{game_id}/set")
 async def set_character(game_id: str, request: Request):
-    print('set_character called')
     data = await request.json()
     if data["for_player"] in app.games[game_id]["characters"]:
         return jsonable_encoder({
             "error": "Für diesen Spieler wurde bereits eine Figur vergeben."}
         ), 400
-    print('app.games', app.games)
-    print('data', data)
-    app.games[game_id]["characters"][data["for_player"]] = {
-        "from": data["from_player"],
+    for_player = data["for_player"]
+    app.games[game_id]["characters"][for_player] = {
+        "from": for_player,
         "name": data["character"]
     }
-    print('app.games after', app.games)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 @app.get("/{game_id}/reveal/{player_id}")
 def reveal(game_id: str, player_id: str):
