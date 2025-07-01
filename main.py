@@ -34,7 +34,6 @@ def index(request: Request):
                 "game_id": gid,
                 "players": list(g["players"].values())
             })
-    print(ongoing_games)
     return templates.TemplateResponse(
         request, "home.html", context={"ongoing_games": ongoing_games}
     )
@@ -67,25 +66,20 @@ async def join(game_id: str, request: Request):
         else:
             name = app.games[game_id]["players"][player_id]
         return JSONResponse(jsonable_encoder(player))
-    else:
-        player_id = secrets.token_urlsafe(8)
-        app.games[game_id]["players"][player_id] = name
-        return JSONResponse(jsonable_encoder(player))
+    player_id = secrets.token_urlsafe(8)
+    app.games[game_id]["players"][player_id] = name
+    return JSONResponse(jsonable_encoder(player))
 
 @app.get("/{game_id}/players")
 def get_players(game_id: str, request: Request):
-    print('games', app.games)
     if game_id in app.games:
-        print(app.games[game_id])
         if "players" in app.games[game_id]:
-            print("Returning players for game", game_id)
             return JSONResponse(jsonable_encoder(app.games[game_id]["players"]))
     return JSONResponse({})
 
 @app.post("/{game_id}/set")
 async def set_character(game_id: int, request: Request):
     data = await request.json()
-    print('data', data)
     if data["for_player"] in app.games[game_id]["characters"]:
         return jsonable_encoder({
             "error": "Für diesen Spieler wurde bereits eine Figur vergeben."}
@@ -95,11 +89,9 @@ async def set_character(game_id: int, request: Request):
         "name": data["character"]
     }
     return Response(status_code=status.HTTP_204_NO_CONTENT)
-#
 @app.get("/{game_id}/reveal/{player_id}")
 def reveal(game_id: str, player_id: str):
     result = {}
-    print(app.games)
     if game_id in app.games:
         for pid, entry in app.games[game_id]["characters"].items():
             if pid != player_id:
