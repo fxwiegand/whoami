@@ -96,6 +96,7 @@ async function join(rejoin=false) {
   }
   let payload = { name };
   if (playerId) payload.player_id = playerId;
+  console.log(payload);
   const res = await fetch(`/${gameId}/join`, {
     method: "POST",
     headers: { 'Content-Type': 'application/json' },
