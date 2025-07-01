@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     message: str
 
 app = FastAPI()
-games = {}
+app.games = {}
 TTL_SECONDS = 3600
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -28,7 +28,7 @@ def index(request: Request):
     now = time.time()
     # Only show games that are not expired
     ongoing_games = []
-    for gid, g in games.items():
+    for gid, g in app.games.items():
         if now - g["created"] <= TTL_SECONDS:
             ongoing_games.append({
                 "game_id": gid,
@@ -42,16 +42,16 @@ def index(request: Request):
 @app.get("/new")
 def new_game(request: Request):
     game_id = secrets.token_urlsafe(6)
-    games[game_id] = {"created": time.time(), "players": {}, "characters": {}}
+    app.games[game_id] = {"created": time.time(), "players": {}, "characters": {}}
     return RedirectResponse(request.url_for("join_game", game_id=game_id))
 
 @app.get("/{game_id}")
 def join_game(game_id: str, request: Request):
-    if game_id not in games:
+    if game_id not in app.games:
         return "Spiel nicht gefunden", 404
-    return templates.TemplateResponse("game.html", {
-        "game_id": game_id, "request": request,
-    })
+    return templates.TemplateResponse(
+        request, "game.html", {"game_id": game_id}
+    )
 
 @app.post("/{game_id}/join")
 async def join(game_id: str, request: Request):
@@ -61,56 +61,59 @@ async def join(game_id: str, request: Request):
         name = player['name']
     if 'player_id' in player:
         player_id = player['player_id']
-    if player_id and player_id in games[game_id]["players"]:
+    if player_id and player_id in app.games[game_id]["players"]:
         if name:
-            games[game_id]["players"][player_id] = name
+            app.games[game_id]["players"][player_id] = name
         else:
-            name = games[game_id]["players"][player_id]
+            name = app.games[game_id]["players"][player_id]
         return JSONResponse(jsonable_encoder(player))
     else:
         player_id = secrets.token_urlsafe(8)
-        games[game_id]["players"][player_id] = name
+        app.games[game_id]["players"][player_id] = name
         return JSONResponse(jsonable_encoder(player))
 
 @app.get("/{game_id}/players")
 def get_players(game_id: str, request: Request):
-    print('games', games)
-    if game_id in games:
-        print(games[game_id])
-        if "players" in games[game_id]:
+    print('games', app.games)
+    if game_id in app.games:
+        print(app.games[game_id])
+        if "players" in app.games[game_id]:
             print("Returning players for game", game_id)
-            return JSONResponse(jsonable_encoder(games[game_id]["players"]))
+            return JSONResponse(jsonable_encoder(app.games[game_id]["players"]))
     return JSONResponse({})
 
 @app.post("/{game_id}/set")
 async def set_character(game_id: int, request: Request):
     data = await request.json()
     print('data', data)
-    # if data["for_player"] in games[game_id]["characters"]:
-    #     return jsonable_encoder({
-    #         "error": "Für diesen Spieler wurde bereits eine Figur vergeben."}
-    #     ), 400
-    # games[game_id]["characters"][data["for_player"]] = {
-    #     "from": data["from_player"],
-    #     "name": data["character"]
-    # }
+    if data["for_player"] in app.games[game_id]["characters"]:
+        return jsonable_encoder({
+            "error": "Für diesen Spieler wurde bereits eine Figur vergeben."}
+        ), 400
+    app.games[game_id]["characters"][data["for_player"]] = {
+        "from": data["from_player"],
+        "name": data["character"]
+    }
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 #
 @app.get("/{game_id}/reveal/{player_id}")
 def reveal(game_id: str, player_id: str):
     result = {}
-    print(games)
-    if game_id in games:
-        for pid, entry in games[game_id]["characters"].items():
+    print(app.games)
+    if game_id in app.games:
+        for pid, entry in app.games[game_id]["characters"].items():
             if pid != player_id:
-                result[games[game_id]["players"][pid]] = entry["name"]
-    assigned = player_id in games[game_id]["characters"]
+                result[app.games[game_id]["players"][pid]] = entry["name"]
+    if game_id in app.games and 'characters' in app.games[game_id]:
+        assigned = player_id in app.games[game_id]["characters"]
+    else:
+        assigned = None
     return jsonable_encoder({"characters": result, "assigned": assigned})
 
 @app.get("/cleanup")
 def cleanup():
     now = time.time()
-    to_delete = [gid for gid, g in games.items() if now - g["created"] > TTL_SECONDS]
+    to_delete = [gid for gid, g in app.games.items() if now - g["created"] > TTL_SECONDS]
     for gid in to_delete:
-        del games[gid]
-    return f"Removed {len(to_delete)} games."
+        del app.games[gid]
+    return f"Removed {len(to_delete)} app.games."
