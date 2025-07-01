@@ -44,3 +44,33 @@ def test_join_game():
     assert "Beitreten" in response.text
     assert "Wähle eine Figur" in response.text
     assert "Die anderen sind:" in response.text
+
+
+def test_get_players():
+    app.games = {'8KwSpmQW': {
+            'created': 1751375661.8583481,
+            'players': {
+                '5nCADHw5eQM': 'test',
+                'abcdefghijk': 'other',
+            },
+            'characters': {},
+        }
+    }
+    response = client.get("/8KwSpmQW/players")
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json() == {'5nCADHw5eQM': 'test', 'abcdefghijk': 'other',}
+
+
+def test_set_character():
+    app.games = {'8KwSpmQW': {
+        'created': 1751375661.8583481, 'players': {'5nCADHw5eQM': 'test'}, 'characters': {}}
+    }
+    response = client.post("/8KwSpmQW/set", json={
+        "for_player": "5nCADHw5eQM",
+        "character": "test_character"
+    })
+    assert response.status_code == status.HTTP_204_NO_CONTENT
+    assert app.games['8KwSpmQW']['characters']['5nCADHw5eQM'] == {
+        'from': '5nCADHw5eQM', 'name': 'test_character'
+    }
+
