@@ -81,8 +81,15 @@ def test_reveal():
         'players': {'5nCADHw5eQM': 'test'},
         'characters': {'5nCADHw5eQM': {'from': '5nCADHw5eQM', 'name': 'test_character'}}
     }}
-    response = client.get("/8KwSpmQW/reveal/5nCADHw5eQM")
+    response = client.get("/8KwSpmQW/reveal/undefined")
     assert response.status_code == status.HTTP_200_OK
-    assert response.json() == {'characters': {'5nCADHw5eQM': 'test_character'}, 'assigned': True}
+    assert response.json() == {'characters': {'test': 'test_character'}, 'assigned': False}
 
 
+def test_cleanup():
+    app.games = {}
+    assert len(app.games) == 0
+    response = client.get("/")
+    assert response.status_code == status.HTTP_200_OK
+    assert "Keine Spiele. Start ein neues!" in response.text
+    assert len(app.games) == 0
