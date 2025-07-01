@@ -74,3 +74,15 @@ def test_set_character():
         'from': '5nCADHw5eQM', 'name': 'test_character'
     }
 
+
+def test_reveal():
+    app.games = {'8KwSpmQW': {
+        'created': 1751375661.8583481,
+        'players': {'5nCADHw5eQM': 'test'},
+        'characters': {'5nCADHw5eQM': {'from': '5nCADHw5eQM', 'name': 'test_character'}}
+    }}
+    response = client.get("/8KwSpmQW/reveal/5nCADHw5eQM")
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json() == {'characters': {'5nCADHw5eQM': 'test_character'}, 'assigned': True}
+
+

@@ -31,11 +31,13 @@ def index(request: Request):
         request, "home.html", context={"ongoing_games": ongoing_games}
     )
 
+
 @app.get("/new")
 def new_game(request: Request):
     game_id = secrets.token_urlsafe(6)
     app.games[game_id] = {"created": time.time(), "players": {}, "characters": {}}
     return RedirectResponse(request.url_for("join_game", game_id=game_id))
+
 
 @app.get("/{game_id}")
 def join_game(game_id: str, request: Request):
@@ -44,6 +46,7 @@ def join_game(game_id: str, request: Request):
     return templates.TemplateResponse(
         request, "game.html", {"game_id": game_id}
     )
+
 
 @app.post("/{game_id}/join")
 async def join(game_id: str, request: Request):
@@ -63,12 +66,14 @@ async def join(game_id: str, request: Request):
     app.games[game_id]["players"][player_id] = name
     return JSONResponse(jsonable_encoder(player))
 
+
 @app.get("/{game_id}/players")
 def get_players(game_id: str, request: Request):
     if game_id in app.games:
         if "players" in app.games[game_id]:
             return JSONResponse(jsonable_encoder(app.games[game_id]["players"]))
     return JSONResponse({})
+
 
 @app.post("/{game_id}/set")
 async def set_character(game_id: str, request: Request):
@@ -83,18 +88,24 @@ async def set_character(game_id: str, request: Request):
         "name": data["character"]
     }
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
 @app.get("/{game_id}/reveal/{player_id}")
 def reveal(game_id: str, player_id: str):
     result = {}
     if game_id in app.games:
         for pid, entry in app.games[game_id]["characters"].items():
+            print('pid', pid, 'player_id', player_id)
             if pid != player_id:
+                print(entry['name'])
                 result[app.games[game_id]["players"][pid]] = entry["name"]
     if game_id in app.games and 'characters' in app.games[game_id]:
         assigned = player_id in app.games[game_id]["characters"]
     else:
-        assigned = None
+        assigned = False
+    print('result', result)
     return jsonable_encoder({"characters": result, "assigned": assigned})
+
 
 @app.get("/cleanup")
 def cleanup():
