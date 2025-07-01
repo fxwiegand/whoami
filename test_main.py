@@ -46,11 +46,19 @@ def test_join_game():
     assert "Die anderen sind:" in response.text
 
 
-def test_rejoin_game():
+def test_join():
     app.games = {'8KwSpmQW': {
         'created': 1751375661.8583481, 'players': {'5nCADHw5eQM': 'test'}, 'characters': {}}
     }
-    response = client.post("/rejoin/8KwSpmQW", json={"name": "test", "player_id": "5nCADHw5eQM"})
+    response = client.post("/game/8KwSpmQW", json={"name": "test", "player_id": "5nCADHw5eQM"})
+    assert response.status_code == status.HTTP_200_OK
+
+
+def test_join_with_player_id():
+    app.games = {'8KwSpmQW': {
+        'created': 1751375661.8583481, 'players': {'5nCADHw5eQM': 'test'}, 'characters': {}}
+    }
+    response = client.post("/game/8KwSpmQW?player_id=5nCADHw5eQM", json={"name": "test", "player_id": "5nCADHw5eQM"})
     assert response.status_code == status.HTTP_200_OK
 
 

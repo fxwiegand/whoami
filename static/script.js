@@ -1,4 +1,4 @@
-let gameId = window.location.pathname.split("/")[1];
+let gameId = window.location.pathname.split("/")[2];
 let playerId = null;
 let playerName = null;
 let updatePlayersInterval = null;
@@ -96,7 +96,7 @@ async function join(rejoin=false) {
   }
   let payload = { name };
   if (playerId) payload.player_id = playerId;
-  const res = await fetch(`/rejoin/${gameId}`, {
+  const res = await fetch(`/game/${gameId}`, {
     method: "POST",
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)
@@ -225,8 +225,8 @@ function updateMenu() {
     menu.className = "mb-4 p-3 rounded-xl bg-indigo-50 border border-indigo-200 flex flex-col gap-2 items-start text-left";
     document.querySelector(".bg-white").insertBefore(menu, document.querySelector(".bg-white").firstChild.nextSibling);
   }
-  const gameUrl = `${window.location.origin}/${gameId}`;
-  const rejoinUrl = `${window.location.origin}/rejoin/${gameId}?player_id=${playerId}`;
+  const gameUrl = `${window.location.origin}/join_game/${gameId}`;
+  const rejoinUrl = `${window.location.origin}/join_game/${gameId}?player_id=${playerId}`;
   menu.innerHTML = `
     <div class="flex flex-col gap-1 w-full">
       <div class="flex flex-col items-center w-full mb-2">

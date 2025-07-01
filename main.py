@@ -47,7 +47,7 @@ def join_game(game_id: str, request: Request):
     )
 
 
-@app.post("/rejoin/{game_id}")
+@app.post("/game/{game_id}")
 async def join(game_id: str, request: Request):
     player = await request.json()
     name = player_id = None
