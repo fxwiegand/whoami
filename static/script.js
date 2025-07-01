@@ -96,7 +96,6 @@ async function join(rejoin=false) {
   }
   let payload = { name };
   if (playerId) payload.player_id = playerId;
-  console.log(payload);
   const res = await fetch(`/${gameId}/join`, {
     method: "POST",
     headers: { 'Content-Type': 'application/json' },
@@ -139,7 +138,6 @@ async function submitCharacter() {
      headers: { 'Content-Type': 'application/json' },
      body: JSON.stringify({ from_player: playerId, for_player, character })
    });
-   console.log(resp);
    if (!resp.ok) {
      const data = await resp.json();
      alert(data.error || "Fehler beim Absenden.");
@@ -154,7 +152,6 @@ async function submitCharacter() {
  stopPlayerSelectAutoUpdate();
  startResultAutoUpdate();
 
- console.log('Player ID', playerId);
  const revealRes = await fetch(`/${gameId}/reveal/${playerId}`);
  const revealData = await revealRes.json();
  showResult(revealData.characters);
