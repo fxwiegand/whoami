@@ -1,5 +1,6 @@
 import uvicorn
-import uuid, time, secrets
+import time
+import secrets
 import os
 
 from fastapi import FastAPI
@@ -18,7 +19,6 @@ from starlette import status
 class Settings(BaseSettings):
     message: str
 
-# settings = Settings()
 app = FastAPI()
 games = {}
 TTL_SECONDS = 3600
@@ -102,7 +102,7 @@ def set_character(game_id: int, request: Request):
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 # @app.get("/{game_id}/reveal/{player_id}")
-# def reveal(game_id: id, player_id: id):
+# def reveal(game_id: id, player_id: id, request: Request):
 #     result = {}
 #     for pid, entry in games[game_id]["characters"].items():
 #         if pid != player_id:
@@ -117,9 +117,3 @@ def cleanup():
     for gid in to_delete:
         del games[gid]
     return f"Removed {len(to_delete)} games."
-
-if __name__ == "__main__":
-    host = os.environ.get("WHOAMI_HOST", "127.0.0.1")
-    port = int(os.environ.get("WHOAMI_PORT", 5000))
-    debug = os.environ.get("WHOAMI_DEBUG", "1").lower() in ("1", "true", "yes", "on")
-    uvicorn.run("fastapi_code:app")
