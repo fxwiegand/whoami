@@ -1,19 +1,15 @@
-import uvicorn
 import time
 import secrets
-import os
 
 from fastapi import FastAPI
-from fastapi.openapi.models import Response
+from fastapi import Response, status
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from pydantic_settings import BaseSettings
-from pydantic import BaseModel
 from fastapi import Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
-from starlette import status
 
 
 class Settings(BaseSettings):
@@ -25,11 +21,6 @@ TTL_SECONDS = 3600
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
-
-
-class Player(BaseModel):
-    player_id: int
-    name: str
 
 
 @app.get("/")
@@ -64,15 +55,11 @@ def join_game(game_id: str, request: Request):
 @app.post("/{game_id}/join")
 async def join(game_id: str, request: Request):
     player = await request.json()
-    print(player)
+    name = player_id = None
     if 'name' in player:
         name = player['name']
-    else:
-        name = None
     if 'player_id' in player:
         player_id = player['player_id']
-    else:
-        player_id = None
     if player_id and player_id in games[game_id]["players"]:
         if name:
             games[game_id]["players"][player_id] = name
@@ -85,30 +72,39 @@ async def join(game_id: str, request: Request):
         return JSONResponse(jsonable_encoder(player))
 
 @app.get("/{game_id}/players")
-def get_players(game_id: int):
-    return JSONResponse(jsonable_encoder(games[game_id]["players"]))
+def get_players(game_id: str, request: Request):
+    print('games', games)
+    if game_id in games:
+        print(games[game_id])
+        if "players" in games[game_id]:
+            print("Returning players for game", game_id)
+            return JSONResponse(jsonable_encoder(games[game_id]["players"]))
+    return JSONResponse({})
 
 @app.post("/{game_id}/set")
-def set_character(game_id: int, request: Request):
-    data = request.json
-    if data["for_player"] in games[game_id]["characters"]:
-        return jsonable_encoder({
-            "error": "Für diesen Spieler wurde bereits eine Figur vergeben."}
-        ), 400
-    games[game_id]["characters"][data["for_player"]] = {
-        "from": data["from_player"],
-        "name": data["character"]
-    }
+async def set_character(game_id: int, request: Request):
+    data = await request.json()
+    print('data', data)
+    # if data["for_player"] in games[game_id]["characters"]:
+    #     return jsonable_encoder({
+    #         "error": "Für diesen Spieler wurde bereits eine Figur vergeben."}
+    #     ), 400
+    # games[game_id]["characters"][data["for_player"]] = {
+    #     "from": data["from_player"],
+    #     "name": data["character"]
+    # }
     return Response(status_code=status.HTTP_204_NO_CONTENT)
-
-# @app.get("/{game_id}/reveal/{player_id}")
-# def reveal(game_id: id, player_id: id, request: Request):
-#     result = {}
-#     for pid, entry in games[game_id]["characters"].items():
-#         if pid != player_id:
-#             result[games[game_id]["players"][pid]] = entry["name"]
-#     assigned = player_id in games[game_id]["characters"]
-#     return jsonable_encoder({"characters": result, "assigned": assigned})
+#
+@app.get("/{game_id}/reveal/{player_id}")
+def reveal(game_id: str, player_id: str):
+    result = {}
+    print(games)
+    if game_id in games:
+        for pid, entry in games[game_id]["characters"].items():
+            if pid != player_id:
+                result[games[game_id]["players"][pid]] = entry["name"]
+    assigned = player_id in games[game_id]["characters"]
+    return jsonable_encoder({"characters": result, "assigned": assigned})
 
 @app.get("/cleanup")
 def cleanup():
