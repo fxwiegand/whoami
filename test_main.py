@@ -30,7 +30,7 @@ def test_new_game():
 
 def test_join_game_not_found():
     app.games = {}
-    response = client.get("/abcdefgh")
+    response = client.get("/join/abcdefgh")
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
@@ -38,12 +38,20 @@ def test_join_game():
     app.games = {'8KwSpmQW': {
         'created': 1751375661.8583481, 'players': {'5nCADHw5eQM': 'test'}, 'characters': {}}
     }
-    response = client.get("/8KwSpmQW")
+    response = client.get("/join_game/8KwSpmQW")
     assert response.status_code == status.HTTP_200_OK
     assert "Wer bin ich?" in response.text
     assert "Beitreten" in response.text
     assert "Wähle eine Figur" in response.text
     assert "Die anderen sind:" in response.text
+
+
+def test_rejoin_game():
+    app.games = {'8KwSpmQW': {
+        'created': 1751375661.8583481, 'players': {'5nCADHw5eQM': 'test'}, 'characters': {}}
+    }
+    response = client.post("/rejoin/8KwSpmQW", json={"name": "test", "player_id": "5nCADHw5eQM"})
+    assert response.status_code == status.HTTP_200_OK
 
 
 def test_get_players():
@@ -56,7 +64,7 @@ def test_get_players():
             'characters': {},
         }
     }
-    response = client.get("/8KwSpmQW/players")
+    response = client.get("/players/8KwSpmQW")
     assert response.status_code == status.HTTP_200_OK
     assert response.json() == {'5nCADHw5eQM': 'test', 'abcdefghijk': 'other',}
 
@@ -65,7 +73,7 @@ def test_set_character():
     app.games = {'8KwSpmQW': {
         'created': 1751375661.8583481, 'players': {'5nCADHw5eQM': 'test'}, 'characters': {}}
     }
-    response = client.post("/8KwSpmQW/set", json={
+    response = client.post("/set/8KwSpmQW", json={
         "for_player": "5nCADHw5eQM",
         "character": "test_character"
     })
@@ -81,14 +89,16 @@ def test_reveal():
         'players': {'5nCADHw5eQM': 'test'},
         'characters': {'5nCADHw5eQM': {'from': '5nCADHw5eQM', 'name': 'test_character'}}
     }}
-    response = client.get("/8KwSpmQW/reveal/undefined")
+    response = client.get("/reveal/8KwSpmQW/undefined")
     assert response.status_code == status.HTTP_200_OK
     assert response.json() == {'characters': {'test': 'test_character'}, 'assigned': False}
 
 
-# def test_cleanup():
-#     app.games = {'8KwSpmQW': {
-#         'created': 1751375661.8583481, 'players': {'5nCADHw5eQM': 'test'}, 'characters': {}}
-#     }
-#     response = client.get("/cleanup")
-#     assert len(app.games) == 0
+def test_cleanup():
+    app.games = {'8KwSpmQW': {
+        'created': 1751375661.8583481, 'players': {'5nCADHw5eQM': 'test'}, 'characters': {}}
+    }
+    response = client.get("/cleanup")
+    assert response.status_code == status.HTTP_200_OK
+    assert "message" in response.json()
+    assert len(app.games) == 0

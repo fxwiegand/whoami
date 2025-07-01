@@ -11,7 +11,7 @@ function getPlayerIdFromUrl() {
 }
 
 async function fetchOwnName() {
-  const res = await fetch(`/${gameId}/players`);
+  const res = await fetch(`/players/${gameId}`);
   const players = await res.json();
   if (playerId && players[playerId]) {
     return players[playerId];
@@ -50,8 +50,8 @@ function showInviteLink() {
 }
 
 async function updatePlayerSelect() {
-  const players = await (await fetch(`/${gameId}/players`)).json();
-  const res = await fetch(`/${gameId}/reveal/${playerId}`);
+  const players = await (await fetch(`/players/${gameId}`)).json();
+  const res = await fetch(`/reveal/${gameId}/${playerId}`);
   const revealData = await res.json();
   assignedTargets = new Set(Object.keys(revealData.characters).map(name => {
     for (const [pid, n] of Object.entries(players)) {
@@ -96,7 +96,7 @@ async function join(rejoin=false) {
   }
   let payload = { name };
   if (playerId) payload.player_id = playerId;
-  const res = await fetch(`/${gameId}/join`, {
+  const res = await fetch(`/rejoin/${gameId}`, {
     method: "POST",
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)
@@ -110,7 +110,7 @@ async function join(rejoin=false) {
     window.history.replaceState({}, "", url);
   }
   updateMenu();
-  const revealRes = await fetch(`/${gameId}/reveal/${playerId}`);
+  const revealRes = await fetch(`/reveal/${gameId}/${playerId}`);
   const revealData = await revealRes.json();
   if (revealData.assigned) {
     document.getElementById("setup").classList.add("hidden");
@@ -133,7 +133,7 @@ async function submitCharacter() {
  const for_player = document.getElementById("target").value;
  const character = document.getElementById("character").value;
  try {
-   const resp = await fetch(`/${gameId}/set`, {
+   const resp = await fetch(`/set/${gameId}`, {
      method: "POST",
      headers: { 'Content-Type': 'application/json' },
      body: JSON.stringify({ from_player: playerId, for_player, character })
@@ -152,7 +152,7 @@ async function submitCharacter() {
  stopPlayerSelectAutoUpdate();
  startResultAutoUpdate();
 
- const revealRes = await fetch(`/${gameId}/reveal/${playerId}`);
+ const revealRes = await fetch(`/reveal/${gameId}/${playerId}`);
  const revealData = await revealRes.json();
  showResult(revealData.characters);
 }
@@ -194,7 +194,7 @@ function stopPlayerSelectAutoUpdate() {
 function startResultAutoUpdate() {
   if (!updateResultInterval) {
     updateResultInterval = setInterval(async () => {
-      const revealRes = await fetch(`/${gameId}/reveal/${playerId}`);
+      const revealRes = await fetch(`/reveal/${gameId}/${playerId}`);
       const revealData = await revealRes.json();
       showResult(revealData.characters);
       updateMenu();
@@ -226,7 +226,7 @@ function updateMenu() {
     document.querySelector(".bg-white").insertBefore(menu, document.querySelector(".bg-white").firstChild.nextSibling);
   }
   const gameUrl = `${window.location.origin}/${gameId}`;
-  const rejoinUrl = `${window.location.origin}/${gameId}?player_id=${playerId}`;
+  const rejoinUrl = `${window.location.origin}/rejoin/${gameId}?player_id=${playerId}`;
   menu.innerHTML = `
     <div class="flex flex-col gap-1 w-full">
       <div class="flex flex-col items-center w-full mb-2">

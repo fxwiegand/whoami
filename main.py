@@ -38,7 +38,7 @@ def new_game(request: Request):
     return RedirectResponse(request.url_for("join_game", game_id=game_id))
 
 
-@app.get("/{game_id}")
+@app.get("/join_game/{game_id}")
 def join_game(game_id: str, request: Request):
     if game_id not in app.games:
         return Response(status_code=status.HTTP_404_NOT_FOUND)
@@ -47,7 +47,7 @@ def join_game(game_id: str, request: Request):
     )
 
 
-@app.post("/{game_id}/join")
+@app.post("/rejoin/{game_id}")
 async def join(game_id: str, request: Request):
     player = await request.json()
     name = player_id = None
@@ -66,7 +66,7 @@ async def join(game_id: str, request: Request):
     return JSONResponse(player)
 
 
-@app.get("/{game_id}/players")
+@app.get("/players/{game_id}")
 def get_players(game_id: str, request: Request):
     if game_id in app.games:
         if "players" in app.games[game_id]:
@@ -74,7 +74,7 @@ def get_players(game_id: str, request: Request):
     return JSONResponse({})
 
 
-@app.post("/{game_id}/set")
+@app.post("/set/{game_id}")
 async def set_character(game_id: str, request: Request):
     data = await request.json()
     if data["for_player"] in app.games[game_id]["characters"]:
@@ -89,7 +89,7 @@ async def set_character(game_id: str, request: Request):
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-@app.get("/{game_id}/reveal/{player_id}")
+@app.get("/reveal/{game_id}/{player_id}")
 def reveal(game_id: str, player_id: str):
     result = {}
     for pid, entry in app.games[game_id]["characters"].items():
