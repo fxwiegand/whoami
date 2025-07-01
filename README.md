@@ -1,6 +1,7 @@
 # Who am I? – Flask Party Game
 
-**"Who am I?"** is a simple, browser-based party game built with Python and Flask. Each player is assigned a famous person or character by another player and must guess who they are.
+**"Who am I?"** is a simple, browser-based party game built with Python and FastAPI. 
+Each player is assigned a famous person or character by another player and must guess who they are.
 
 ## Features
 
@@ -31,20 +32,26 @@
 
 3. **Start the server**
 
+   - Development mode (with auto-reload):
    ```bash
-   python app.py
+   fastapi dev app.py
    ```
 
-   You can control host, port, and debug mode via environment variables (optional):
+    - Production mode (using uvicorn):
+   ```bash
+    uvicorn main:app
+   ```
+
+   You can control host and port by setting these parameters:
 
    ```bash
-   WHOAMI_HOST=0.0.0.0 WHOAMI_PORT=8080 WHOAMI_DEBUG=0 python app.py
+   uvicorn main:app --host 0.0.0.0 --port 5000
    ```
 
    Default values are:
-   - `WHOAMI_HOST=127.0.0.1`
-   - `WHOAMI_PORT=5000`
-   - `WHOAMI_DEBUG=1` (enables debug mode)
+   - host: 127.0.0.1
+   - port: 5000
+
 
 4. **Open in your browser**
 
@@ -52,7 +59,7 @@
 
 ## Files
 
-- `app.py` – Flask backend, game logic, and API
+- `main.py` – FAstAPI backend, game logic, and API
 - `static/script.js` – Frontend logic (JS)
 - `templates/game.html` – HTML template for the game
 - `requirements.txt` – Python dependencies

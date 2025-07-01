@@ -34,9 +34,10 @@ def index(request: Request):
                 "game_id": gid,
                 "players": list(g["players"].values())
             })
-    return templates.TemplateResponse("home.html", {
-        "games": ongoing_games, "request": request
-    })
+    print(ongoing_games)
+    return templates.TemplateResponse(
+        request, "home.html", context={"ongoing_games": ongoing_games}
+    )
 
 @app.get("/new")
 def new_game(request: Request):
