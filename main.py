@@ -93,17 +93,10 @@ async def set_character(game_id: str, request: Request):
 @app.get("/{game_id}/reveal/{player_id}")
 def reveal(game_id: str, player_id: str):
     result = {}
-    if game_id in app.games:
-        for pid, entry in app.games[game_id]["characters"].items():
-            print('pid', pid, 'player_id', player_id)
-            if pid != player_id:
-                print(entry['name'])
-                result[app.games[game_id]["players"][pid]] = entry["name"]
-    if game_id in app.games and 'characters' in app.games[game_id]:
-        assigned = player_id in app.games[game_id]["characters"]
-    else:
-        assigned = False
-    print('result', result)
+    for pid, entry in app.games[game_id]["characters"].items():
+        if pid != player_id:
+            result[app.games[game_id]["players"][pid]] = entry["name"]
+    assigned = player_id in app.games[game_id]["characters"]
     return jsonable_encoder({"characters": result, "assigned": assigned})
 
 
