@@ -60,10 +60,10 @@ async def join(game_id: str, request: Request):
             app.games[game_id]["players"][player_id] = name
         else:
             name = app.games[game_id]["players"][player_id]
-        return JSONResponse(player)
+        return JSONResponse({"player_id": player_id, "name": name})
     player_id = secrets.token_urlsafe(8)
     app.games[game_id]["players"][player_id] = name
-    return JSONResponse(player)
+    return JSONResponse({"player_id": player_id, "name": name})
 
 
 @app.get("/players/{game_id}")
@@ -92,10 +92,14 @@ async def set_character(game_id: str, request: Request):
 @app.get("/reveal/{game_id}/{player_id}")
 def reveal(game_id: str, player_id: str):
     result = {}
-    for pid, entry in app.games[game_id]["characters"].items():
-        if pid != player_id:
-            result[app.games[game_id]["players"][pid]] = entry["name"]
-    assigned = player_id in app.games[game_id]["characters"]
+    if game_id in app.games:
+        for pid, entry in app.games[game_id]["characters"].items():
+            if pid != player_id:
+                result[app.games[game_id]["players"][pid]] = entry["name"]
+        assigned = player_id in app.games[game_id]["characters"]
+    else:
+        result = {}
+        assigned = False
     return JSONResponse({"characters": result, "assigned": assigned})
 
 
