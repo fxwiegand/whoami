@@ -1,0 +1,2 @@
+[start]
+cmd = "WHOAMI_HOST=0.0.0.0 WHOAMI_PORT=${PORT} WHOAMI_DEBUG=0 gunicorn app:app"
